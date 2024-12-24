@@ -1,0 +1,40 @@
+import requests
+from bs4 import BeautifulSoup
+
+# Veb səhifəni əldə etmək
+url = "https://sap.aztu.edu.az/studies/lecture_attend.php?lec_open_idx=60461&lecture_code=4138&sem_code=20242"
+
+# Sessiya yaratmaq
+session = requests.Session()
+
+# Veb səhifəyə GET sorğusu göndərmək
+response = session.get(url)
+
+# Əgər sorğu uğurludursa, səhifənin məzmununu işlə
+if response.status_code == 200:
+    # BeautifulSoup ilə HTML məzmununu analiz et
+    soup = BeautifulSoup(response.content, "html.parser")
+    
+    # Burada, davamiyyəti tapmaq üçün HTML strukturuna uyğun elementləri tapmaq lazımdır
+    # Bu səhifədəki uyğun HTML elementləri tapmaq üçün inspector istifadə edərək,
+    # misal olaraq <table> və ya <tr> tag-larını nəzərdən keçirə bilərsiniz.
+    
+    # Məsələn, əgər davamiyyət cədvəli <table class="attendance"> daxilindədirsə:
+    table = soup.find("table", {"class": "attendance"})
+    
+    if table:
+        # Cədvəldəki bütün sətirləri alırıq
+        rows = table.find_all("tr")
+        
+        # Cədvəli çap etmək
+        for row in rows:
+            # Hər sətirdəki xanaları tapırıq
+            cols = row.find_all("td")
+            
+            # Hər xananı çap edirik
+            cols = [col.text.strip() for col in cols]
+            print(cols)
+    else:
+        print("Davamiyyət cədvəli tapılmadı!")
+else:
+    print(f"Veb səhifəyə girişdə xəta baş verdi. Status kodu: {response.status_code}")
